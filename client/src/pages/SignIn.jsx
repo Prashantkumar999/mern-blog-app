@@ -2,13 +2,14 @@ import React, { useState } from 'react';
 import { FaEyeSlash } from "react-icons/fa";
 import { IoEyeSharp } from "react-icons/io5";
 import { Link, useNavigate } from 'react-router-dom';
-
+import {signInSuccess} from '../redux/user/userSlice';
+import { useDispatch } from 'react-redux';
 const SignIn = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState(null); // Optional: to display error messages
   const navigate = useNavigate();
-
+const dispatch = useDispatch();
   // Handle form input changes
   const onChangeHandler = (event) => {
     setFormData({ ...formData, [event.target.id]: event.target.value });
@@ -33,6 +34,8 @@ const SignIn = () => {
 
       const data = await response.json();
       console.log('User signed in:', data);
+
+      dispatch(signInSuccess(data))
 
       // If login is successful, navigate to the home page
       navigate('/');
