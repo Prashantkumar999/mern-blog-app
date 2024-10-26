@@ -2,14 +2,18 @@ import React, { useState } from 'react';
 import { FaEyeSlash } from "react-icons/fa";
 import { IoEyeSharp } from "react-icons/io5";
 import { Link, useNavigate } from 'react-router-dom';
-import {signInSuccess} from '../redux/user/userSlice';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { signInStart, signInSuccess, signInFailure } from '../redux/user/userSlice';
+
 const SignIn = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
-  const [errorMessage, setErrorMessage] = useState(null); // Optional: to display error messages
   const navigate = useNavigate();
-const dispatch = useDispatch();
+  const dispatch = useDispatch();
+  
+  // Destructure loading and error from the Redux store, renaming error to errorMessage
+  const { loading, error: errorMessage } = useSelector(state => state.user);
+
   // Handle form input changes
   const onChangeHandler = (event) => {
     setFormData({ ...formData, [event.target.id]: event.target.value });
@@ -18,6 +22,9 @@ const dispatch = useDispatch();
   // Handle form submission
   const onSubmitHandler = async (event) => {
     event.preventDefault();
+    
+    // Start the sign-in process (set loading to true)
+    dispatch(signInStart());
 
     try {
       const response = await fetch('/api/auth/signin', {
@@ -26,22 +33,23 @@ const dispatch = useDispatch();
         body: JSON.stringify(formData),
       });
 
-      // Handle non-2xx status codes
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to sign in');
+        dispatch(signInFailure(errorData.message));
+        return;
       }
 
       const data = await response.json();
       console.log('User signed in:', data);
 
-      dispatch(signInSuccess(data))
+      // Dispatch success and update state with user data
+      dispatch(signInSuccess(data));
 
       // If login is successful, navigate to the home page
       navigate('/');
     } catch (error) {
       console.error('Error:', error.message);
-      setErrorMessage(error.message); // Set error message to display in UI
+      dispatch(signInFailure(error.message));
     }
   };
 
@@ -90,13 +98,14 @@ const dispatch = useDispatch();
         {/* Submit Button */}
         <button
           type='submit'
-          className='bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition duration-200'
+          className={`bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition duration-200 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+          disabled={loading}
         >
-          Sign In
+          {loading ? 'Signing In...' : 'Sign In'}
         </button>
       </form>
 
-      {/* Display Error Message */}
+      {/* Display Error Message from Redux */}
       {errorMessage && (
         <div className='text-red-500 font-semibold mt-3'>
           {errorMessage}
