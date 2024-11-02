@@ -4,6 +4,7 @@ import { IoEyeSharp } from "react-icons/io5";
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { signInStart, signInSuccess, signInFailure } from '../redux/user/userSlice';
+import OAuth from '../components/OAuth';
 
 const SignIn = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
@@ -111,6 +112,8 @@ const SignIn = () => {
           {errorMessage}
         </div>
       )}
+
+      <OAuth/>
 
       {/* Link to Sign Up */}
       <div className='mt-4'>

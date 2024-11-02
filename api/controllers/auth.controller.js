@@ -1,62 +1,95 @@
-import User from '../models/user.model.js'
-import bcryptjs from 'bcryptjs'
-import { errorHandler } from '../utils/error.js'
-import Jwt from 'jsonwebtoken'
+import User from '../models/user.model.js';
+import bcryptjs from 'bcryptjs';
+import { errorHandler } from '../utils/error.js';
+import jwt from 'jsonwebtoken';
+
 export const signup = async (req, res, next) => {
-    const { username, email, password } = req.body
+    const { username, email, password } = req.body;
 
     if (!username || !email || !password) {
-        next(errorHandler(400, "all fields are required"))
+        return next(errorHandler(400, "All fields are required"));
     }
-    const hashedPass = bcryptjs.hashSync(password, 10)
-    try {
-        const newUser = new User({ username, email, password: hashedPass })
-        await newUser.save()
 
-        res.json({
-            message: "User created successfully!"
-        })
+    try {
+        const hashedPassword = bcryptjs.hashSync(password, 10);
+        const newUser = new User({ username, email, password: hashedPassword });
+        await newUser.save();
+
+        res.json({ message: "User created successfully!" });
+    } catch (error) {
+        next(error);
     }
-    catch (error) {
-        next(error)
-    }
-}
+};
 
 export const signin = async (req, res, next) => {
-    console.log("enterred in signin")
     const { email, password } = req.body;
 
     if (!email || !password) {
-        next(errorHandler(400, "All fields are required"))
+        return next(errorHandler(400, "All fields are required"));
     }
+
     try {
-        const validUser = await User.findOne({ email })
-        if (!validUser) {
-           return next(errorHandler(404, "User not found"));
+        const user = await User.findOne({ email });
+        if (!user) {
+            return next(errorHandler(404, "User not found"));
         }
-        const validPassword = bcryptjs.compareSync(password, validUser.password) // we are using bcrypt compairSync to validate the password ,,becasue password is encrypted and the just cant compair 
-        if (!validPassword) {
-            return next(errorHandler(400, "please enter the valid password"))
+
+        const isPasswordValid = bcryptjs.compareSync(password, user.password);
+        if (!isPasswordValid) {
+            return next(errorHandler(400, "Invalid password"));
         }
-        // creating a token for auth
-        const token = Jwt.sign(
-            { id: validUser._id },
-            process.env.SECRET_KEY,
-        );
-        res.status(200).cookie('access_token', token, {
-            httpOnly: true,
-        }).json({
-            validUser:{
-                _id:validUser._id,
-                username: validUser.username,
-                email:validUser.email,
-            }
-        })
 
-        console.log("exit")
+        const token = jwt.sign({ id: user._id }, process.env.SECRET_KEY);
+        res.status(200)
+            .cookie('access_token', token, { httpOnly: true })
+            .json({
+                validUser: {
+                    _id: user._id,
+                    username: user.username,
+                    email: user.email,
+                }
+            });
 
-    }
-    catch (error) {
+    } catch (error) {
         next(error);
     }
-}
+};
+
+export const google = async (req, res, next) => {
+    const { email, name, gmailPhotoUrl } = req.body;
+
+    try {
+        const user = await User.findOne({ email });
+        let token;
+
+        if (user) {
+            token = jwt.sign({ id: user._id }, process.env.SECRET_KEY);
+            const { password, ...userData } = user._doc;
+
+            res.status(200)
+                .cookie('access_token', token, { httpOnly: true })
+                .json(userData);
+        } else {
+            const generatedPassword = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8);
+            const hashedPassword = bcryptjs.hashSync(generatedPassword, 10);
+
+            const newUser = new User({
+                username: name.toLowerCase().split(' ').join('') + Math.random().toString(10).slice(-4),
+                email,
+                password: hashedPassword,
+                profilePicture: gmailPhotoUrl,
+            });
+
+            await newUser.save();
+
+            token = jwt.sign({ id: newUser._id }, process.env.SECRET_KEY);
+            const { password, ...userData } = newUser._doc;
+
+            res.status(200)
+                .cookie('access_token', token, { httpOnly: true })
+                .json(userData);
+        }
+    } catch (error) {
+        next(error);
+    }
+};
