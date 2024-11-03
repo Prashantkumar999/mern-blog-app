@@ -2,10 +2,14 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Avatar, Button, Dropdown, DropdownDivider, DropdownHeader, DropdownItem, Navbar, TextInput } from 'flowbite-react';
 import { CiSearch } from "react-icons/ci";
-import { FaMoon } from "react-icons/fa";
-import {useSelector} from 'react-redux';
+import { FaMoon,FaSun } from "react-icons/fa";
+import {useSelector, useDispatch} from 'react-redux';
+import { toggleTheme } from '../redux/theme/themeSlice';
+
 
 const Header = () => {
+    const dispatch = useDispatch();
+const {theme} = useSelector((state)=>state.theme)
     const path = useLocation().pathname
     const {currentUser} = useSelector(state =>state.user)
     return (
@@ -24,8 +28,10 @@ const Header = () => {
                 <CiSearch />
             </Button>
             <div className='flex gap-3 md:order-2'>
-                <Button className='w-12 h-10 hidden lg:flex items-center sm:inline bg-black' pill>
-                    <FaMoon />
+                <Button className='w-12 h-10 hidden lg:flex items-center sm:inline bg-black' pill onClick={()=>dispatch(toggleTheme())}>
+                  {
+                    theme === 'light' ? <FaMoon /> : <FaSun/>
+                  }
                 </Button>
                {
                 currentUser? (
