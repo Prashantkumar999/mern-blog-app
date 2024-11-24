@@ -61,7 +61,7 @@ const DashboardProfile = () => {
             }
         );
     };
-console.log("progress",imageFileUploadProgress)
+console.log("progress",imageFileUploadProgress);
     return (
         <div className="w-full">
             <form className="w-full flex flex-col gap-3">

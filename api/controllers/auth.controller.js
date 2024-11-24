@@ -49,7 +49,6 @@ export const signin = async (req, res, next) => {
                     email: user.email,
                 }
             });
-
     } catch (error) {
         next(error);
     }
