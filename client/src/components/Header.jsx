@@ -5,13 +5,30 @@ import { CiSearch } from "react-icons/ci";
 import { FaMoon,FaSun } from "react-icons/fa";
 import {useSelector, useDispatch} from 'react-redux';
 import { toggleTheme } from '../redux/theme/themeSlice';
-
+import { signoutSuccess } from '../redux/user/userSlice';
 
 const Header = () => {
     const dispatch = useDispatch();
 const {theme} = useSelector((state)=>state.theme)
     const path = useLocation().pathname
-    const {currentUser} = useSelector(state =>state.user)
+    const {currentUser} = useSelector(state =>state.user);
+    const handleSignOut = async () => {
+        try {
+            const response = await fetch('/api/user/signout',
+                {
+                    method: "POST"
+                });
+            const data = await response.json();
+            if (!response.ok) {
+                console.log(data.message);
+            }
+            else {
+                dispatch(signoutSuccess())
+            }
+        } catch (error) {
+            console.log(error.message);
+        }
+    }
     return (
         <Navbar>
             <Link className='bg-red-400'>
@@ -49,7 +66,7 @@ const {theme} = useSelector((state)=>state.theme)
 <Link to={'/dashboard?tab=profile'}>
 <DropdownItem>Profile</DropdownItem>
 <DropdownDivider/>
-<DropdownItem>Sign Out</DropdownItem>
+<DropdownItem onClick={handleSignOut}>Sign Out</DropdownItem>
 </Link>
                     </Dropdown>
                 ) : ( <Link to={"/signin"}>

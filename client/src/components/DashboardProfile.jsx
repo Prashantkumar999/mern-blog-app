@@ -5,7 +5,7 @@ import { getDownloadURL, getStorage, uploadBytesResumable, ref } from 'firebase/
 import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import { app } from '../firebase';
-import { updateStart, updateSuccess, updateFailure, deleteUserStart, deleteUserSuccess, deleteUserFailure } from '../redux/user/userSlice';
+import { updateStart, updateSuccess, updateFailure, deleteUserStart, deleteUserSuccess, deleteUserFailure, signoutSuccess } from '../redux/user/userSlice';
 import { FaEyeSlash } from "react-icons/fa";
 import { FaEye } from "react-icons/fa";
 import { PiSealWarningFill } from "react-icons/pi";
@@ -133,6 +133,24 @@ const DashboardProfile = () => {
             dispatch(deleteUserFailure(error.message))
         }
     }
+
+    const handleSignOut = async () => {
+        try {
+            const response = await fetch('/api/user/signout',
+                {
+                    method: "POST"
+                });
+            const data = await response.json();
+            if (!response.ok) {
+                console.log(data.message);
+            }
+            else {
+                dispatch(signoutSuccess())
+            }
+        } catch (error) {
+            console.log(error.message);
+        }
+    }
     return (
         <div className="w-full">
             <form onSubmit={handleSubmitForm} className="w-full flex flex-col gap-3 lg:px-10">
@@ -218,7 +236,8 @@ const DashboardProfile = () => {
 
                 <div className="flex text-red-600 font-semibold mx-10 justify-between">
                     <span onClick={() => setDeleteAccountScreen(true)} className="cursor-pointer">Delete Account</span>
-                    <span className="cursor-pointer">Sign Out</span>
+                    <span onClick={handleSignOut}
+                        className="cursor-pointer">Sign Out</span>
                 </div>
                 {
                     userUpdateStatus && <Alert color='success'>
