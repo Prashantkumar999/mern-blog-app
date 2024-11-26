@@ -18,24 +18,26 @@ export const updateUser = async (req, res, next) => {
         }
     }
     //pass hashing
-    req.body.password = bcryptjs.hashSync(req.body.password, 10);
+    if(req.body.password){
+        req.body.password = bcryptjs.hashSync(req.body.password, 10);
+    }
     // conditions for the username 
     if (req.body.username) {
         if (req.body.username.length < 7 || req.body.username.length > 20) {
             return next(errorHandler(400, "username must be between 7 and 20 chars"));
         }
-    }
-    // handle space 
-    if (req.body.username.includes(' ')) {
-        return next(errorHandler(400, "username cannot contain spaces"))
-    }
-    //handle upercase
-    if (req.body.username != req.body.username.toLowerCase()) {
-        return next(errorHandler(400, "username must be in lowercase"))
-    }
-
-    if (!req.body.username.match(/^[a-zA-Z0-9]+$/)) {
-        return next(errorHandler(400, "username can only contain letters and numbers"));
+        // handle space 
+        if (req.body.username.includes(' ')) {
+            return next(errorHandler(400, "username cannot contain spaces"))
+        }
+        //handle upercase
+        if (req.body.username != req.body.username.toLowerCase()) {
+            return next(errorHandler(400, "username must be in lowercase"))
+        }
+        
+        if (!req.body.username.match(/^[a-zA-Z0-9]+$/)) {
+            return next(errorHandler(400, "username can only contain letters and numbers"));
+        }
     }
     
     try {

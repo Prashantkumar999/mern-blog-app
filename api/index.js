@@ -3,7 +3,7 @@ import mongoose from 'mongoose'
 import dotenv from 'dotenv'
 import userRoutes from './routes/user.route.js'
 import authRouters from './routes/auth.route.js'
-import cors from 'cors'
+// import cors from 'cors'
 import cookieParser from 'cookie-parser'
 
 dotenv.config()
@@ -19,11 +19,7 @@ mongoose.connect(process.env.MONGODB_URL)
 
 const app = express()
 
-// CORS setup (adjust origin for production)
-app.use(cors({
-  origin: '*', // Adjust based on your frontend URL in production
-  credentials: true, // Allows sending cookies
-}))
+
 
 // Middleware
 app.use(cookieParser()) // Move this above routes

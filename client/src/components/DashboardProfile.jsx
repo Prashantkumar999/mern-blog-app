@@ -1,10 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Alert, Button, TextInput } from 'flowbite-react';
 import { getDownloadURL, getStorage, uploadBytesResumable, ref } from 'firebase/storage';
 import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import { app } from '../firebase';
+import { updateStart, updateSuccess, updateFailure } from '../redux/user/userSlice';
+import { FaEyeSlash } from "react-icons/fa";
+import { FaEye } from "react-icons/fa";
 
 const DashboardProfile = () => {
     const { currentUser } = useSelector((state) => state.user);
@@ -14,9 +17,15 @@ const DashboardProfile = () => {
     const [imageFileUrl, setImageFileUrl] = useState(null);
     const [imageFileUploadProgress, setImageFileUploadProgress] = useState(null);
     const [imageFileUploadError, setImageFileUploadError] = useState(null);
+    const [formData, setFormData] = useState({});
+    const [showPassword, setShowPassword] = useState(false);
+    const [imageUploading, setImageUploading] = useState(false);
+    const [userUpdateStatus, setUserUpdateStatus] = useState(null);
+    const [userUpdateError, setUserUpdateError] = useState(null);
+
 
     const filePicRef = useRef();
-
+    const dispatch = useDispatch();
     const imageChangeHandler = (event) => {
         const imageFile = event.target.files[0];
         if (imageFile) {
@@ -39,6 +48,7 @@ const DashboardProfile = () => {
     }, [currentImageFile]);
 
     const uploadImage = () => {
+        setImageUploading(true);
         const storage = getStorage(app);
         const fileName = new Date().getTime() + currentImageFile.name;
         const storageRef = ref(storage, fileName);
@@ -53,18 +63,60 @@ const DashboardProfile = () => {
             (error) => {
                 setImageFileUploadError('Could not upload image. Please try again.');
                 console.log(error);
+                setImageUploading(false)
             },
             () => {
                 getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
                     setImageFileUrl(downloadURL);
+                    setFormData({ ...formData, profilePicture: downloadURL });
                 });
+                setImageUploading(false);
             }
         );
     };
-console.log("progress",imageFileUploadProgress);
+    const onChangeHandler = (e) => {
+        setFormData({ ...formData, [e.target.id]: e.target.value })
+    }
+    const handleSubmitForm = async (e) => {
+        e.preventDefault();
+        if (Object.keys(formData).length === 0) {
+            setUserUpdateError("No changes made");
+            setUserUpdateStatus(false);
+            return;
+        }
+        if (imageUploading) {
+            setImageFileUploadError("Uploading Image please wait...")
+            return;
+        }
+        try {
+            dispatch(updateStart());
+            const response = await fetch(`/api/user/update/${currentUser._id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            });
+            const data = await response.json();
+            if (!response.ok) {
+                dispatch(updateFailure());
+            }
+            else {
+                dispatch(updateSuccess(data));
+                setUserUpdateStatus("User updated successfully")
+                setUserUpdateError(null);
+
+            }
+
+        } catch (error) {
+            dispatch(updateFailure(error.message));
+            setImageFileUploadProgress(error.message)
+        }
+
+    }
     return (
         <div className="w-full">
-            <form className="w-full flex flex-col gap-3">
+            <form onSubmit={handleSubmitForm} className="w-full flex flex-col gap-3 lg:px-10">
                 <div className="flex flex-col items-center">
                     {currentUser?.profilePicture ? (
                         <>
@@ -76,22 +128,22 @@ console.log("progress",imageFileUploadProgress);
                                 ref={filePicRef}
                                 hidden
                             />
-                            <div onClick={() => filePicRef.current.click()}className='relative'>
-                            {imageFileUploadProgress && (<CircularProgressbar value={imageFileUploadProgress || 0} text={`${imageFileUploadProgress}`}
-                            strokeWidth={5}
-                            styles={{
-                                root:{
-                                    width:'100%',
-                                    height:'100%',
-                                    position:'absolute',
-                                    top:0,
-                                    left:0
-                                },
-                                path:{
-                                    stroke:"lightblue"
-                                }
-                            }}
-                            />)}
+                            <div onClick={() => filePicRef.current.click()} className='relative'>
+                                {imageFileUploadProgress && (<CircularProgressbar value={imageFileUploadProgress || 0} text={`${imageFileUploadProgress}`}
+                                    strokeWidth={5}
+                                    styles={{
+                                        root: {
+                                            width: '100%',
+                                            height: '100%',
+                                            position: 'absolute',
+                                            top: 0,
+                                            left: 0
+                                        },
+                                        path: {
+                                            stroke: "lightblue"
+                                        }
+                                    }}
+                                />)}
                                 <img
                                     src={imageFileUrl || currentUser.profilePicture}
                                     alt="Profile"
@@ -109,28 +161,59 @@ console.log("progress",imageFileUploadProgress);
                     id="username"
                     placeholder="Username"
                     defaultValue={currentUser.username}
+                    onChange={onChangeHandler}
                 />
                 <TextInput
                     type="text"
                     id="email"
                     placeholder="Email"
                     defaultValue={currentUser.email}
+                    onChange={onChangeHandler}
                 />
-                <TextInput
-                    type="text"
-                    id="password"
-                    placeholder="Password"
-                />
+
+                <div className="relative w-full flex">
+                    <TextInput
+                        type={showPassword ? "text" : "password"}
+                        id="password"
+                        placeholder="Password"
+                        onChange={onChangeHandler}
+                        className="w-[80%] pr-10" // Full width and padding for the icon
+
+                    />
+                    <button
+                        className={`flex items-center gap-2 font-semibold w-[20%] text-white just justify-center ${showPassword?"bg-green-400":"bg-red-400"} rounded-md hover:scale-95 transition-all duration-200`}
+                        onClick={() => setShowPassword((prev) => !prev)} // Correctly toggling state
+                        type="button" // Prevent form submission when clicking the button
+                    >
+                        {showPassword ? "Hide Password" : "Show Password"}
+                        {showPassword ? <FaEyeSlash /> : <FaEye />}
+                    </button>
+
+                </div>
+
                 <Button type="submit" color="green" className="self-center">
                     Update Profile
                 </Button>
             </form>
+<div className='px-10'>
 
             <div className="flex text-red-600 font-semibold mx-10 justify-between">
                 <span className="cursor-pointer">Delete Account</span>
-                <span className="cursor-pointer">Delete Account</span>
+                <span className="cursor-pointer">Sign Out</span>
             </div>
+            {
+                userUpdateStatus && <Alert color='success'>
+                    {userUpdateStatus}
+                </Alert>
+            }
+            {
+                userUpdateError && <Alert color='failure'>
+                    {userUpdateError}
+                </Alert>
+            }
+
         </div>
+</div>
     );
 };
 
