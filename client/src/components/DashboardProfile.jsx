@@ -1,16 +1,17 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Alert, Button, TextInput } from 'flowbite-react';
+import { Alert, Button, TextInput, Modal } from 'flowbite-react';
 import { getDownloadURL, getStorage, uploadBytesResumable, ref } from 'firebase/storage';
 import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import { app } from '../firebase';
-import { updateStart, updateSuccess, updateFailure } from '../redux/user/userSlice';
+import { updateStart, updateSuccess, updateFailure, deleteUserStart, deleteUserSuccess, deleteUserFailure } from '../redux/user/userSlice';
 import { FaEyeSlash } from "react-icons/fa";
 import { FaEye } from "react-icons/fa";
+import { PiSealWarningFill } from "react-icons/pi";
 
 const DashboardProfile = () => {
-    const { currentUser } = useSelector((state) => state.user);
+    const { currentUser, error } = useSelector((state) => state.user);
     // console.log('Current User:', currentUser); for testing purpose
 
     const [currentImageFile, setCurrentImageFile] = useState(null);
@@ -22,6 +23,7 @@ const DashboardProfile = () => {
     const [imageUploading, setImageUploading] = useState(false);
     const [userUpdateStatus, setUserUpdateStatus] = useState(null);
     const [userUpdateError, setUserUpdateError] = useState(null);
+    const [deleteAccountScreen, setDeleteAccountScreen] = useState(null)
 
 
     const filePicRef = useRef();
@@ -114,6 +116,23 @@ const DashboardProfile = () => {
         }
 
     }
+    const handleDeleteUser = async () => {
+        setDeleteAccountScreen(false);
+        try {
+            dispatch(deleteUserStart());
+            const response = await fetch(`/api/user/delete/${currentUser._id}`, {
+                method: "DELETE"
+            });
+            const data = await response.json();
+            if (!response.ok) {
+                dispatch(deleteUserFailure(data.message))
+            } else {
+                dispatch(deleteUserSuccess())
+            }
+        } catch (error) {
+            dispatch(deleteUserFailure(error.message))
+        }
+    }
     return (
         <div className="w-full">
             <form onSubmit={handleSubmitForm} className="w-full flex flex-col gap-3 lg:px-10">
@@ -181,7 +200,7 @@ const DashboardProfile = () => {
 
                     />
                     <button
-                        className={`flex items-center gap-2 font-semibold w-[20%] text-white just justify-center ${showPassword?"bg-green-400":"bg-red-400"} rounded-md hover:scale-95 transition-all duration-200`}
+                        className={`flex items-center gap-2 font-semibold w-[20%] text-white just justify-center ${showPassword ? "bg-green-400" : "bg-red-400"} rounded-md hover:scale-95 transition-all duration-200`}
                         onClick={() => setShowPassword((prev) => !prev)} // Correctly toggling state
                         type="button" // Prevent form submission when clicking the button
                     >
@@ -195,25 +214,41 @@ const DashboardProfile = () => {
                     Update Profile
                 </Button>
             </form>
-<div className='px-10'>
+            <div className='px-10'>
 
-            <div className="flex text-red-600 font-semibold mx-10 justify-between">
-                <span className="cursor-pointer">Delete Account</span>
-                <span className="cursor-pointer">Sign Out</span>
+                <div className="flex text-red-600 font-semibold mx-10 justify-between">
+                    <span onClick={() => setDeleteAccountScreen(true)} className="cursor-pointer">Delete Account</span>
+                    <span className="cursor-pointer">Sign Out</span>
+                </div>
+                {
+                    userUpdateStatus && <Alert color='success'>
+                        {userUpdateStatus}
+                    </Alert>
+                }
+                {
+                    userUpdateError && <Alert color='failure'>
+                        {userUpdateError}
+                    </Alert>
+                }
+                <Modal show={deleteAccountScreen} onClose={() => setDeleteAccountScreen(false)} popup size='md'>
+                    <Modal.Header />
+                    <Modal.Body>
+                        <div className='flex justify-center flex-col items-center gap-4'>
+                            <PiSealWarningFill className='w-12 h-12' />
+                            <p>Do You Really Want To Delete Your Account?</p>
+                            <div className='flex justify-between gap-4'>
+                                <Button color='failure' onClick={handleDeleteUser}>
+                                    Yes I'm Sure
+                                </Button>
+                                <Button color='gray' onClick={() => setDeleteAccountScreen(false)}>
+                                    No, Cancel
+                                </Button>
+                            </div>
+                        </div>
+                    </Modal.Body>
+                </Modal>
             </div>
-            {
-                userUpdateStatus && <Alert color='success'>
-                    {userUpdateStatus}
-                </Alert>
-            }
-            {
-                userUpdateError && <Alert color='failure'>
-                    {userUpdateError}
-                </Alert>
-            }
-
         </div>
-</div>
     );
 };
 
