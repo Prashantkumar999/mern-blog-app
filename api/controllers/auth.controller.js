@@ -39,7 +39,7 @@ export const signin = async (req, res, next) => {
             return next(errorHandler(400, "Invalid password"));
         }
 
-        const token = jwt.sign({ id: user._id }, process.env.SECRET_KEY);
+        const token = jwt.sign({ id: user._id,isAdmin:user.isAdmin }, process.env.SECRET_KEY);
         res.status(200)
             .cookie('access_token', token, { httpOnly: true })
             .json({
@@ -62,7 +62,7 @@ export const google = async (req, res, next) => {
         let token;
 
         if (user) {
-            token = jwt.sign({ id: user._id }, process.env.SECRET_KEY);
+            token = jwt.sign({ id: user._id ,isAdmin:user.isAdmin}, process.env.SECRET_KEY);
             const { password, ...userData } = user._doc;
 
             res.status(200)
@@ -81,7 +81,7 @@ export const google = async (req, res, next) => {
 
             await newUser.save();
 
-            token = jwt.sign({ id: newUser._id }, process.env.SECRET_KEY);
+            token = jwt.sign({ id: newUser._id,isAdmin:newUser.isAdmin }, process.env.SECRET_KEY);
             const { password, ...userData } = newUser._doc;
 
             res.status(200)
