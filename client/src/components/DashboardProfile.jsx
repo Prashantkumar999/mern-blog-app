@@ -9,9 +9,10 @@ import { updateStart, updateSuccess, updateFailure, deleteUserStart, deleteUserS
 import { FaEyeSlash } from "react-icons/fa";
 import { FaEye } from "react-icons/fa";
 import { PiSealWarningFill } from "react-icons/pi";
+import {Link} from 'react-router-dom'
 
 const DashboardProfile = () => {
-    const { currentUser, error } = useSelector((state) => state.user);
+    const { currentUser, error, loading } = useSelector((state) => state.user);
     // console.log('Current User:', currentUser); for testing purpose
 
     const [currentImageFile, setCurrentImageFile] = useState(null);
@@ -153,7 +154,7 @@ const DashboardProfile = () => {
     }
     return (
         <div className="w-full">
-            <form onSubmit={handleSubmitForm} className="w-full flex flex-col gap-3 lg:px-10">
+            <form onSubmit={handleSubmitForm} className="w-[70%] mx-auto flex flex-col gap-3 lg:px-10">
                 <div className="flex flex-col items-center">
                     {currentUser?.profilePicture ? (
                         <>
@@ -228,11 +229,20 @@ const DashboardProfile = () => {
 
                 </div>
 
-                <Button type="submit" color="green" className="self-center">
-                    Update Profile
-                </Button>
+                <Button type="submit" color="success" className="self-center w-full" disabled={loading || imageUploading}>
+                    {loading ? "Loading..." : "Update"}
+                </Button>{
+                    currentUser.isAdmin && (
+                        <Link to={'/create-post'} >
+                        <Button type='button' className='self-center w-full'>
+                        Create Post
+                    </Button>
+                        </Link>
+                    )
+                }
+
             </form>
-            <div className='px-10'>
+            <div className='px-10 w-[70%] mx-auto'>
 
                 <div className="flex text-red-600 font-semibold mx-10 justify-between">
                     <span onClick={() => setDeleteAccountScreen(true)} className="cursor-pointer">Delete Account</span>
