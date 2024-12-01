@@ -103,7 +103,7 @@ const DashPosts = () => {
                     }
                 </>
             ) : (
-                <p>You have no posts yet!</p>
+                <p>You have no posts yet</p>
             )}
         </div>
     );
