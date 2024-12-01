@@ -48,17 +48,19 @@ const DashPosts = () => {
     }
     const handleDeletePost = async () => {
         setShowConfirmationScreen(false);
+        console.log(postIdToDelete,currentUser._id)
         try {
             const response = await fetch(`/api/post/deletepost/${postIdToDelete}/${currentUser._id}`,
             {
                 method:'DELETE',
             });
-            const data = response.json();
-            if(!response.ok){
-                console.log(data.message);
-            }else{
-                setUserPosts((prev)=>prev.filter((post)=>PiSockThin._id !== postIdToDelete));
+            const data =await response.json();
+            if (!response.ok) {
+                console.log(data.message || 'Failed to delete the post.');
+            } else {
+                setUserPosts((prev) => prev.filter((post) => post._id !== postIdToDelete));
             }
+            
         } catch (error) {
             console.log(error.message);
         }
