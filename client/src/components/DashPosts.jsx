@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 const DashPosts = () => {
     const { currentUser } = useSelector((state) => state.user);
     const [userPosts, setUserPosts] = useState([]);
-
+    const [showMore, setShowMore] = useState(true);
     useEffect(() => {
         const fetchPosts = async () => {
             try {
@@ -14,6 +14,9 @@ const DashPosts = () => {
                 const data = await response.json();
                 if (response.ok) {
                     setUserPosts(data.posts);
+                    if (data.posts.length < 9) {
+                        setShowMore(false);
+                    }
                 }
             } catch (error) {
                 console.log(error);
@@ -23,7 +26,22 @@ const DashPosts = () => {
             fetchPosts();
         }
     }, [currentUser._id]);
+    const handleShowMore = async () => {
+        const startIndex = userPosts.length;
+        try {
+            const response = await fetch(`/api/post/getposts?userId=${currentUser._id}&startIndex=${startIndex}`);
 
+            const data = await response.json();
+            if (response.ok) {
+                setUserPosts((prev) => [...prev, ...data.posts]);
+                if (data.posts.length < 9) {
+                    setShowMore(false);
+                }
+            }
+        } catch (error) {
+            console.log(error.message);
+        }
+    }
     return (
         <div
             className="table-auto overflow-x-auto md:mx-auto p-3  scrollbar-thumb-gray-400 scrollbar-track-gray-200 dark:scrollbar-thumb-slate-600 dark:scrollbar-trak-400"
@@ -76,6 +94,13 @@ const DashPosts = () => {
                             ))}
                         </Table.Body>
                     </Table>
+                    {
+                        showMore && (
+                            <button onClick={handleShowMore} className='w-full text-gray-400'>
+                                Show More
+                            </button>
+                        )
+                    }
                 </>
             ) : (
                 <p>You have no posts yet!</p>
