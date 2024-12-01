@@ -2,11 +2,15 @@ import { Table } from 'flowbite-react';
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
+import { Modal, Button } from 'flowbite-react';
+import { PiSealWarningFill } from 'react-icons/pi'
 
 const DashPosts = () => {
     const { currentUser } = useSelector((state) => state.user);
     const [userPosts, setUserPosts] = useState([]);
     const [showMore, setShowMore] = useState(true);
+    const [showConfirmationScreen, setShowConfirmationScreen] = useState(false);
+    const [postIdToDelete, setPostIdToDelete] = useState('');
     useEffect(() => {
         const fetchPosts = async () => {
             try {
@@ -37,6 +41,23 @@ const DashPosts = () => {
                 if (data.posts.length < 9) {
                     setShowMore(false);
                 }
+            }
+        } catch (error) {
+            console.log(error.message);
+        }
+    }
+    const handleDeletePost = async () => {
+        setShowConfirmationScreen(false);
+        try {
+            const response = await fetch(`/api/post/deletepost/${postIdToDelete}/${currentUser._id}`,
+            {
+                method:'DELETE',
+            });
+            const data = response.json();
+            if(!response.ok){
+                console.log(data.message);
+            }else{
+                setUserPosts((prev)=>prev.filter((post)=>PiSockThin._id !== postIdToDelete));
             }
         } catch (error) {
             console.log(error.message);
@@ -83,7 +104,10 @@ const DashPosts = () => {
                                     </Table.Cell>
                                     <Table.Cell>{post.category}</Table.Cell>
                                     <Table.Cell>
-                                        <span className="text-red-500">Delete</span>
+                                        <span onClick={() => {
+                                            setShowConfirmationScreen(true);
+                                            setPostIdToDelete(post._id);
+                                        }} className="text-red-500 cursor-pointer">Delete</span>
                                     </Table.Cell>
                                     <Table.Cell>
                                         <Link to={`/update-post/${post._id}`}>
@@ -105,6 +129,23 @@ const DashPosts = () => {
             ) : (
                 <p>You have no posts yet</p>
             )}
+            <Modal show={showConfirmationScreen} onClose={() => setShowConfirmationScreen(false)} popup size='md'>
+                <Modal.Header />
+                <Modal.Body>
+                    <div className='flex justify-center flex-col items-center gap-4'>
+                        <PiSealWarningFill className='w-12 h-12' />
+                        <p>Do You Really Want To Delete Your Post?</p>
+                        <div className='flex justify-between gap-4'>
+                            <Button color='failure' onClick={handleDeletePost}>
+                                Yes I'm Sure
+                            </Button>
+                            <Button color='gray' onClick={() => setShowConfirmationScreen(false)}>
+                                No, Cancel
+                            </Button>
+                        </div>
+                    </div>
+                </Modal.Body>
+            </Modal>
         </div>
     );
 };
