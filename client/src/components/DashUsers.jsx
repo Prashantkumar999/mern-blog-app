@@ -51,9 +51,23 @@ const DashUsers = () => {
         }
     }
   const handleDeleteUser = async()=>{
-
+try{
+const response = await fetch(`/api/user/delete/${userIdToDelete}`,{
+    method:'DELETE',
+})
+const data = await response.json();
+if(response.ok){
+    setUsers((prev)=>prev.filter((user)=>user._id !== userIdToDelete));
+    setShowConfirmationScreen(false);
+}else{
+    console.log(data.message);
+}
+}catch(error)
+{
+    console.log(error)
+}
   }
-  console.log(users)
+//   console.log(users) only for testing purpose
     return (
         <div
             className="table-auto overflow-x-auto md:mx-auto p-3  scrollbar-thumb-gray-400 scrollbar-track-gray-200 dark:scrollbar-thumb-slate-600 dark:scrollbar-trak-400"
