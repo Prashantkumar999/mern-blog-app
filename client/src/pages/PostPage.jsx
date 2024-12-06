@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { Button, Spinner } from 'flowbite-react';
 import { Link } from 'react-router-dom';
 import CallToAction from '../components/CallToAction';
+import CommentSection from '../components/CommentSection';
 
 const PostPage = () => {
     const { postSlug } = useParams();
@@ -50,7 +51,7 @@ const PostPage = () => {
     }
 
     return (
-        <main className="p-4 max-w-[90%] flex flex-col items-center justify-center">
+        <main className="p-4 max-w-[90%] mx-auto flex flex-col items-center justify-center">
             <h1 className="text-2xl font-bold mb-4 ">{post?.title}</h1>
             <Link to={`/search?category=${post?.category}`}>
                 <Button outline className=' self-center'>{post?.category}</Button>
@@ -73,6 +74,7 @@ const PostPage = () => {
             <div className='max-w-4xl mx-auto w-full'>
                 <CallToAction/>
             </div>
+            <CommentSection postId={post._id}/>
         </main>
     );
 };
