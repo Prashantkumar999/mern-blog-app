@@ -1,13 +1,15 @@
 import { async } from '@firebase/util';
 import { Alert, Button, TextInput, Textarea } from 'flowbite-react';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import Comment from '../../../api/models/comment.model';
+import Comment from './Comment';
 const CommentSection = ({ postId }) => {
     const { currentUser } = useSelector((state) => state.user);
     const [comment, setComment] = useState("");
     const [commentError, setCommentError] = useState(null)
+    const [comments, setComments] = useState([]);
+    // console.log(comments)
     const handleSubmitComment = async (event) => {
         event.preventDefault();
         if (comment.length > 200) {
@@ -31,6 +33,17 @@ const CommentSection = ({ postId }) => {
             setCommentError(error.message);
         }
     }
+    useEffect(() => {
+        const getComments = async () => {
+            const res = await fetch(`/api/comment/getPostComments/${postId}`);
+            if (res.ok) {
+                const data = await res.json();
+                setComments(data);
+            }
+        }
+        getComments()
+
+    }, [postId])
     return (
         <div className='w-full'>
             {
@@ -69,6 +82,30 @@ const CommentSection = ({ postId }) => {
 
                     </form>
                 )
+            }
+            {
+
+                comments.length === 0 ?
+                    (<p>No Comments Yet</p>) :
+                    (
+                        <>
+                        <div className='flex items-center gap-1 '>
+                            <p>Comments</p>
+                            <div className='border-1 border-red-400'>
+                                <p>{comments.length}</p>
+                            </div>
+                        </div>
+                        {
+                            comments.map(comment=>(
+                                <Comment 
+                                key={comment._id}
+                                comment={comment}
+                                />
+                            ))
+                        }
+                       
+                        </>
+                    )
             }
 
         </div>
