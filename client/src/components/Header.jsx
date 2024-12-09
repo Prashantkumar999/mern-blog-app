@@ -58,7 +58,7 @@ const {theme} = useSelector((state)=>state.theme)
                     >
 <Dropdown.Header className='flex flex-col gap-1 justify-center items-center'>
 <div className='W-full flex justify-center'>
-<img src={currentUser.profilePicture}  className='rounded-full'/>
+<img src={currentUser.profilePicture}  className='rounded-full w-20 h-20'/>
 </div>
     <span className='block font-semibold'>@{currentUser.username}</span>
     <span className='font-semibold'>{currentUser.email}</span>

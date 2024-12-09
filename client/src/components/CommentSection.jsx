@@ -3,6 +3,8 @@ import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import Comment from './Comment';
+import { editComment } from '../../../api/controllers/comment.controller';
+import { FaCommentMedical } from 'react-icons/fa';
 
 const CommentSection = ({ postId }) => {
     const { currentUser } = useSelector((state) => state.user);
@@ -50,6 +52,17 @@ const CommentSection = ({ postId }) => {
         };
         getComments();
     }, [postId]);
+
+    const handleEdit = (editedComment, editedContent) => {
+        setComments((prevComments) =>
+            prevComments.map((comment) =>
+                comment._id === editedComment._id
+                    ? { ...comment, content: editedContent }
+                    : comment
+            )
+        );
+    };
+    
 
     const handleLike = async (commentId) => {
         try {
@@ -126,7 +139,7 @@ const CommentSection = ({ postId }) => {
                         </div>
                     </div>
                     {comments.map((comment) => (
-                        <Comment key={comment._id} comment={comment} onLike={handleLike} />
+                        <Comment key={comment._id} comment={comment} onLike={handleLike} onEdit ={handleEdit}/>
                     ))}
                 </>
             )}
