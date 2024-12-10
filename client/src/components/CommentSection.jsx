@@ -84,7 +84,7 @@ const CommentSection = ({ postId }) => {
     };
 
     return (
-        <div>
+        <div className='w-full'>
             {currentUser ? (
                 <>
                     <p>Signed in as @{currentUser.username}</p>

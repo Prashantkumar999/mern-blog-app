@@ -4,19 +4,20 @@ import { Button, Spinner } from 'flowbite-react';
 import { Link } from 'react-router-dom';
 import CallToAction from '../components/CallToAction';
 import CommentSection from '../components/CommentSection';
-
+import PostCard from '../components/PostCard';
 const PostPage = () => {
     const { postSlug } = useParams();
-    const [loading, setLoading] = useState(true); 
+    const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
     const [post, setPost] = useState(null);
+    const [recentArticles, setRecentArticles] = useState(null);
 
     useEffect(() => {
         const fetchPost = async () => {
             try {
                 setLoading(true);
                 const response = await fetch(`/api/post/getposts?slug=${postSlug}`);
-                const data = await response.json(); 
+                const data = await response.json();
 
                 if (!response.ok) {
                     setError(true);
@@ -33,6 +34,22 @@ const PostPage = () => {
         };
         fetchPost();
     }, [postSlug]);
+
+    useEffect(() => {
+        try {
+            const fetchRecentArticles = async()=>{
+                const res = await fetch(`/api/post/getPosts?limit=3`)
+                const data = await res.json();
+                if(res.ok){
+                    setRecentArticles(data.posts);
+                }
+            }
+            fetchRecentArticles();
+        } catch (error) {
+            console.log(error.message);
+        }
+    }, [])
+    console.log(recentArticles)
 
     if (loading) {
         return (
@@ -67,14 +84,24 @@ const PostPage = () => {
             </div>
             {/* Rendering HTML content safely */}
             <div
-            // post content index.css
+                // post content index.css
                 className="post-content"
                 dangerouslySetInnerHTML={{ __html: post?.content }}
             ></div>
             <div className='max-w-4xl mx-auto w-full'>
-                <CallToAction/>
+                <CallToAction />
             </div>
-            <CommentSection postId={post._id}/>
+            <CommentSection postId={post._id} />
+            <div>
+    <h2 className="text-xl font-semibold mb-4 text-gray-700">Recent Articles</h2>
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {recentArticles &&
+            recentArticles.map((article) => (
+                <PostCard key={article._id} article={article} />
+            ))}
+    </div>
+</div>
+
         </main>
     );
 };
