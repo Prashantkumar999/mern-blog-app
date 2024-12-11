@@ -7,7 +7,7 @@ import { signoutSuccess } from '../redux/user/userSlice'
 import { HiDocumentText } from 'react-icons/hi'
 import { FaUsers } from "react-icons/fa";
 import { MdOutlineComment } from "react-icons/md";
-
+import { RxDashboard } from "react-icons/rx";
 
 const DashboardSidebar = () => {
   const location = useLocation();
@@ -84,6 +84,17 @@ const DashboardSidebar = () => {
                   icon={MdOutlineComment}
                   as='div'
                 >Comments</Sidebar.Item>
+              </Link>
+            )
+          }
+          {
+            currentUser.isAdmin && (
+              <Link to='/dashboard?tab=dash'>
+                <Sidebar.Item
+                  active={tab === 'dash'}
+                  icon={RxDashboard }
+                  as='div'
+                >Dashboard</Sidebar.Item>
               </Link>
             )
           }
