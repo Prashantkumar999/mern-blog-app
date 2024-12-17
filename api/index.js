@@ -7,6 +7,7 @@ import commentRoute from './routes/comment.route.js'
 // import cors from 'cors'
 import cookieParser from 'cookie-parser'
 import postRoutes from './routes/post.route.js'
+import path from 'path'
 
 dotenv.config()
 
@@ -18,13 +19,13 @@ mongoose.connect(process.env.MONGODB_URL)
   .catch((err) => {
     console.log("Database connection error:", err)
   })
-
+const __dirname = path.resolve();
 const app = express()
 
 
 
 // Middleware
-app.use(cookieParser()) // Move this above routes
+app.use(cookieParser()) 
 app.use(express.json())
 
 // Routes
@@ -32,6 +33,11 @@ app.use('/api/user', userRoutes)
 app.use('/api/auth', authRouters)
 app.use('/api/post',postRoutes)
 app.use('/api/comment',commentRoute)
+
+app.use(express.static(path.join(__dirname,'/client/dist')));
+app.get('*',(req,res)=>{
+  res.sendFile(path.join(__dirname,'client','dist','index.html'));
+});
 
 // Error handling middleware
 app.use((err, req, res, next) => {
