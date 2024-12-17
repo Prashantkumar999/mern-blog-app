@@ -9,7 +9,7 @@ import { updateStart, updateSuccess, updateFailure, deleteUserStart, deleteUserS
 import { FaEyeSlash } from "react-icons/fa";
 import { FaEye } from "react-icons/fa";
 import { PiSealWarningFill } from "react-icons/pi";
-import {Link} from 'react-router-dom'
+import { Link } from 'react-router-dom'
 
 const DashboardProfile = () => {
     const { currentUser, error, loading } = useSelector((state) => state.user);
@@ -185,7 +185,7 @@ const DashboardProfile = () => {
                                 <img
                                     src={imageFileUrl || currentUser.profilePicture}
                                     alt="Profile"
-                                    className="bg-red-400 rounded-full w-[60px] h-[60px] self-center"
+                                    className="bg-red-400 rounded-full w-[60px] h-[60px] self-center object-cover"
                                 />
                             </div>
                             {imageFileUploadError && <Alert color='failure'>{imageFileUploadError}</Alert>}
@@ -215,15 +215,15 @@ const DashboardProfile = () => {
                         id="password"
                         placeholder="Password"
                         onChange={onChangeHandler}
-                        className="w-[80%] pr-10" // Full width and padding for the icon
+                        className="w-full pr-1" // Full width and padding for the icon
 
                     />
                     <button
-                        className={`flex items-center gap-2 font-semibold w-[20%] text-white just justify-center ${showPassword ? "bg-green-400" : "bg-red-400"} rounded-md hover:scale-95 transition-all duration-200`}
+                        className={`flex items-center gap-2 font-semibold w-1/4 text-white just justify-center ${showPassword ? "bg-green-400" : "bg-red-400"} rounded-md hover:scale-95 transition-all duration-200`}
                         onClick={() => setShowPassword((prev) => !prev)} // Correctly toggling state
                         type="button" // Prevent form submission when clicking the button
                     >
-                        {showPassword ? "Hide Password" : "Show Password"}
+                        {/* {showPassword ? "Hide Password" : "Show Password"} */}
                         {showPassword ? <FaEyeSlash /> : <FaEye />}
                     </button>
 
@@ -234,20 +234,26 @@ const DashboardProfile = () => {
                 </Button>{
                     currentUser.isAdmin && (
                         <Link to={'/create-post'} >
-                        <Button type='button' className='self-center w-full'>
-                        Create Post
-                    </Button>
+                            <Button type='button' className='self-center w-full'>
+                                Create Post
+                            </Button>
                         </Link>
                     )
                 }
 
             </form>
-            <div className='px-10 w-[70%] mx-auto'>
+            <div className='w-[70%] mx-auto'>
 
-                <div className="flex text-red-600 font-semibold mx-10 justify-between">
-                    <span onClick={() => setDeleteAccountScreen(true)} className="cursor-pointer">Delete Account</span>
+                <div className="flex justify-between text-[10px] sm:text-sm text-red-700 font-semibold mt-1">
+                    <span
+                        onClick={() => setDeleteAccountScreen(true)}
+                        className="w-full cursor-pointer  whitespace-nowrap truncate text-center  hover:text-red-500"
+                    >
+                        Delete Account
+                    </span>
+
                     <span onClick={handleSignOut}
-                        className="cursor-pointer">Sign Out</span>
+                        className="cursor-pointer w-full text-center  hover:text-red-500 transition-all duration-200 ">Sign Out</span>
                 </div>
                 {
                     userUpdateStatus && <Alert color='success'>

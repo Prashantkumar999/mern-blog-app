@@ -152,7 +152,6 @@ console.log(comments)
                         <Table.Head>
                             <Table.HeadCell>Post Image</Table.HeadCell>
                             <Table.HeadCell>Title</Table.HeadCell>
-                            <Table.HeadCell>Category</Table.HeadCell>
                         </Table.Head>
                         <Table.Body>
                             {
@@ -162,7 +161,6 @@ console.log(comments)
                                         <Table.Cell><img src={post.image}/></Table.Cell>
                                     </Link>
                                         <Table.Cell>{post.title}</Table.Cell>
-                                        <Table.Cell>{post.category}</Table.Cell>
                                     </Table.Row>
                                 ))
                             }

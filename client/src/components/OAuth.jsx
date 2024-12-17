@@ -39,7 +39,7 @@ const OAuth = () => {
         }
     }
     return (
-        <button onClick={handleGoogleClick} className='flex gap-3 items-center justify-center text-md font-semibold  px-3 w-full py-2 rounded-md bg-yellow-300 hover:bg-yellow-400 transition-all duration-200 '>
+        <button onClick={handleGoogleClick} className='flex gap-3 items-center justify-center text-md font-semibold  px-3 w-full py-2 rounded-md dark:bg-black bg-yellow-300 dark:hover:bg-gray-800 hover:bg-yellow-400  transition-all duration-200 '>
             <p>
                 Sign In With Google
             </p> <FaGoogle />

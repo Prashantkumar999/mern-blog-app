@@ -42,7 +42,9 @@ const SignUp = () => {
   };
 
   return (
-    <div className='w-full max-w-md mx-auto flex flex-col items-center justify-center gap-8 p-6 bg-white shadow-md rounded-md'>
+    <div className='min-h-screen flex justify-center items-start sm:items-center dark:text-white'>
+
+    <div className='w-full max-w-md mx-auto flex flex-col items-center justify-center gap-8 p-6 bg-white dark:bg-gray-900 shadow-md rounded-md'>
       <h1 className='font-bold text-3xl'>Create Account</h1>
 
       <form className='w-full flex flex-col gap-6' onSubmit={onSubmitHandler}>
@@ -125,6 +127,7 @@ const SignUp = () => {
           </Link>
         </p>
       </div>
+    </div>
     </div>
   );
 };

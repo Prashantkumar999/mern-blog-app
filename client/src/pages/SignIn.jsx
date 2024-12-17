@@ -55,10 +55,12 @@ const SignIn = () => {
   };
 
   return (
-    <div className='w-full max-w-md mx-auto flex flex-col items-center justify-center gap-8 p-6 bg-white shadow-md rounded-md'>
-      <h1 className='font-bold text-3xl'>Sign In</h1>
+    <div className='min-h-screen flex justify-center items-center'>
 
-      <form className='w-full flex flex-col gap-6' onSubmit={onSubmitHandler}>
+    <div className='w-full max-w-md mx-auto flex flex-col items-center justify-center gap-8 p-6 dark:bg-gray-900  bg-white shadow-md rounded-md'>
+      <h1 className='font-bold text-3xl dark:text-white'>Sign In</h1>
+
+      <form className='w-full flex flex-col gap-6 dark:text-white' onSubmit={onSubmitHandler}>
         {/* Email Field */}
         <div className='flex flex-col'>
           <label htmlFor='email' className='font-semibold'>
@@ -124,6 +126,7 @@ const SignIn = () => {
           </Link>
         </p>
       </div>
+    </div>
     </div>
   );
 };

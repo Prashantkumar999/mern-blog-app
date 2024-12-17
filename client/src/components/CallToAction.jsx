@@ -9,7 +9,7 @@ const CallToAction = () => {
                 <p>
                     Checkout these resources with 100 javascript projects
                 </p>
-                <Button className='w-40 self-center mt-2'>
+                <Button className='w-40 self-center mt-2 hover:scale-95 transition-all duration-200'>
                     <a>Learn More</a>
                 </Button>
             </div>
