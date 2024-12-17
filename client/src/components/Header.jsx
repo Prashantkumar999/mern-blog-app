@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Avatar, Button, Dropdown, DropdownDivider, DropdownHeader, DropdownItem, Navbar, TextInput } from 'flowbite-react';
+import {Button, Dropdown, DropdownDivider, DropdownHeader, DropdownItem, Navbar, TextInput } from 'flowbite-react';
 import { CiSearch } from "react-icons/ci";
 import { FaMoon, FaSun } from "react-icons/fa";
 import { useSelector, useDispatch } from 'react-redux';
 import { toggleTheme } from '../redux/theme/themeSlice';
 import { signoutSuccess } from '../redux/user/userSlice';
-import logo from '../assets/images/logo.png'
+
 
 const Header = () => {
     const dispatch = useDispatch();
@@ -117,11 +117,6 @@ const Header = () => {
                         About Me
                     </Link>
                 </Navbar.Link>
-                {/* <Navbar.Link active={path === "/projects"} as={'div'}>
-                    <Link to={"/projects"}>
-                        Projects
-                    </Link>
-                </Navbar.Link> */}
             </Navbar.Collapse>
 
         </Navbar>
