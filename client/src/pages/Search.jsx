@@ -100,8 +100,8 @@ const Search = () => {
         }
     }
     return (
-        <div className='flex flex-col sm:flex-row gap-2 '>
-            <div className='w-[40%] text-md font-semibold'>
+        <div className='flex flex-col md:flex-row gap-2 '>
+            <div className='lg:w-[40%] w-full text-md font-semibold px-2'>
                 <form onSubmit={handleSubmit} className='flex flex-col gap-3 w-full'>
                     <div>
                         <label>Search Term</label>

@@ -89,7 +89,7 @@ const CreatePost = () => {
     };
     return (
         <div>
-            <form className='flex flex-col w-[50%] mx-auto  m-3 p-3 gap-3' onSubmit={handleFormSubmit}>
+            <form className='flex flex-col lg:w-[50%] w-full mx-auto  m-3 p-3 gap-3' onSubmit={handleFormSubmit}>
                 <div className='flex flex-col sm:flex-row gap-3'>
                     <TextInput type='text' required id='title' placeholder='title' className='flex-1' onChange={(e) => setFormData({ ...formData, title: e.target.value })} />
                     <Select
