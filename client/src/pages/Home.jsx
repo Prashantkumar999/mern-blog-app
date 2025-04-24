@@ -4,6 +4,7 @@ import { Link, useParams } from 'react-router-dom';
 import CallToAction from '../components/CallToAction';
 import CommentSection from '../components/CommentSection';
 import PostCard from '../components/PostCard';
+import HomePageHeroSec from '../components/HomePageHeroSec';
 
 export default function PostPage() {
   const { postSlug } = useParams();
@@ -73,7 +74,7 @@ export default function PostPage() {
   return (
     <main className='p-3 flex flex-col max-w-6xl mx-auto min-h-screen'>
       <div className='max-w-4xl mx-auto w-full'>
-        <CallToAction />
+      <HomePageHeroSec/>
       </div>
       <div className='flex flex-col justify-center items-center mb-5'>
         <h1 className='text-3xl mt-5 font-semibold '>Recent Articles</h1>
