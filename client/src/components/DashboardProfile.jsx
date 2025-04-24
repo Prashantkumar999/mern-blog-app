@@ -153,138 +153,155 @@ const DashboardProfile = () => {
         }
     }
     return (
-        <div className="w-full">
-            <form onSubmit={handleSubmitForm} className="w-[70%] mx-auto flex flex-col gap-3 lg:px-10">
+        <div className="w-full min-h-screen bg-gray-50 dark:bg-gray-900 py-10 px-4">
+            <form
+                onSubmit={handleSubmitForm}
+                className="max-w-3xl mx-auto bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md space-y-6"
+            >
+                {/* Profile Picture Section */}
                 <div className="flex flex-col items-center">
-                    {currentUser?.profilePicture ? (
-                        <>
-                            <p className="text-3xl font-semibold text-slate-500">User Profile</p>
-                            <input
-                                type="file"
-                                accept="image/*"
-                                onChange={imageChangeHandler}
-                                ref={filePicRef}
-                                hidden
+                    <p className="text-2xl font-semibold text-gray-700 dark:text-gray-100 mb-4">User Profile</p>
+                    <input
+                        type="file"
+                        accept="image/*"
+                        onChange={imageChangeHandler}
+                        ref={filePicRef}
+                        hidden
+                    />
+                    <div
+                        onClick={() => filePicRef.current.click()}
+                        className="relative cursor-pointer"
+                    >
+                        {imageFileUploadProgress && (
+                            <CircularProgressbar
+                                value={imageFileUploadProgress || 0}
+                                text={`${imageFileUploadProgress}%`}
+                                strokeWidth={5}
+                                styles={{
+                                    root: {
+                                        width: '60px',
+                                        height: '60px',
+                                        position: 'absolute',
+                                        top: 0,
+                                        left: 0,
+                                    },
+                                    path: {
+                                        stroke: '#60a5fa',
+                                    },
+                                }}
                             />
-                            <div onClick={() => filePicRef.current.click()} className='relative'>
-                                {imageFileUploadProgress && (<CircularProgressbar value={imageFileUploadProgress || 0} text={`${imageFileUploadProgress}`}
-                                    strokeWidth={5}
-                                    styles={{
-                                        root: {
-                                            width: '100%',
-                                            height: '100%',
-                                            position: 'absolute',
-                                            top: 0,
-                                            left: 0
-                                        },
-                                        path: {
-                                            stroke: "lightblue"
-                                        }
-                                    }}
-                                />)}
-                                <img
-                                    src={imageFileUrl || currentUser.profilePicture}
-                                    alt="Profile"
-                                    className="bg-red-400 rounded-full w-[60px] h-[60px] self-center object-cover"
-                                />
-                            </div>
-                            {imageFileUploadError && <Alert color='failure'>{imageFileUploadError}</Alert>}
-                        </>
-                    ) : (
-                        <p>No profile picture available</p>
+                        )}
+                        <img
+                            src={imageFileUrl || currentUser.profilePicture}
+                            alt="Profile"
+                            className="rounded-full w-[60px] h-[60px] object-cover border-2 border-blue-400"
+                        />
+                    </div>
+                    {imageFileUploadError && (
+                        <Alert color="failure" className="mt-4 w-full">
+                            {imageFileUploadError}
+                        </Alert>
                     )}
                 </div>
+
+                {/* Form Inputs */}
                 <TextInput
                     type="text"
                     id="username"
                     placeholder="Username"
                     defaultValue={currentUser.username}
                     onChange={onChangeHandler}
+                    className="w-full"
                 />
                 <TextInput
-                    type="text"
+                    type="email"
                     id="email"
                     placeholder="Email"
                     defaultValue={currentUser.email}
                     onChange={onChangeHandler}
+                    className="w-full"
                 />
 
-                <div className="relative w-full flex">
+                {/* Password Field with Toggle */}
+                <div className="relative flex items-center">
                     <TextInput
-                        type={showPassword ? "text" : "password"}
+                        type={showPassword ? 'text' : 'password'}
                         id="password"
                         placeholder="Password"
                         onChange={onChangeHandler}
-                        className="w-full pr-1" // Full width and padding for the icon
-
+                        className="w-full"
                     />
                     <button
-                        className={`flex items-center gap-2 font-semibold w-1/4 text-white just justify-center ${showPassword ? "bg-green-400" : "bg-red-400"} rounded-md hover:scale-95 transition-all duration-200`}
-                        onClick={() => setShowPassword((prev) => !prev)} // Correctly toggling state
-                        type="button" // Prevent form submission when clicking the button
+                        type="button"
+                        onClick={() => setShowPassword((prev) => !prev)}
+                        className="absolute right-3 text-gray-600 dark:text-gray-300"
                     >
-                        {/* {showPassword ? "Hide Password" : "Show Password"} */}
                         {showPassword ? <FaEyeSlash /> : <FaEye />}
                     </button>
-
                 </div>
 
-                <Button type="submit" color="success" className="self-center w-full" disabled={loading || imageUploading}>
-                    {loading ? "Loading..." : "Update"}
-                </Button>{
-                    currentUser.isAdmin && (
-                        <Link to={'/create-post'} >
-                            <Button type='button' className='self-center w-full'>
-                                Create Post
-                            </Button>
-                        </Link>
-                    )
-                }
+                {/* Update Button */}
+                <Button
+                    type="submit"
+                    color="success"
+                    className="w-full"
+                    disabled={loading || imageUploading}
+                >
+                    {loading ? 'Updating...' : 'Update Profile'}
+                </Button>
 
+                {/* Create Post (Admin only) */}
+                {currentUser.isAdmin && (
+                    <Link to="/create-post">
+                        <Button color="blue" className="w-full">
+                            + Create Post
+                        </Button>
+                    </Link>
+                )}
+
+                {/* Status Alerts */}
+                {userUpdateStatus && <Alert color="success">{userUpdateStatus}</Alert>}
+                {userUpdateError && <Alert color="failure">{userUpdateError}</Alert>}
             </form>
-            <div className='w-[70%] mx-auto'>
 
-                <div className="flex justify-between text-[10px] sm:text-sm text-red-700 font-semibold mt-1">
-                    <span
-                        onClick={() => setDeleteAccountScreen(true)}
-                        className="w-full cursor-pointer  whitespace-nowrap truncate text-center  hover:text-red-500"
-                    >
-                        Delete Account
-                    </span>
-
-                    <span onClick={handleSignOut}
-                        className="cursor-pointer w-full text-center  hover:text-red-500 transition-all duration-200 ">Sign Out</span>
-                </div>
-                {
-                    userUpdateStatus && <Alert color='success'>
-                        {userUpdateStatus}
-                    </Alert>
-                }
-                {
-                    userUpdateError && <Alert color='failure'>
-                        {userUpdateError}
-                    </Alert>
-                }
-                <Modal show={deleteAccountScreen} onClose={() => setDeleteAccountScreen(false)} popup size='md'>
-                    <Modal.Header />
-                    <Modal.Body>
-                        <div className='flex justify-center flex-col items-center gap-4'>
-                            <PiSealWarningFill className='w-12 h-12' />
-                            <p>Do You Really Want To Delete Your Account?</p>
-                            <div className='flex justify-between gap-4'>
-                                <Button color='failure' onClick={handleDeleteUser}>
-                                    Yes I'm Sure
-                                </Button>
-                                <Button color='gray' onClick={() => setDeleteAccountScreen(false)}>
-                                    No, Cancel
-                                </Button>
-                            </div>
-                        </div>
-                    </Modal.Body>
-                </Modal>
+            {/* Footer Controls */}
+            <div className="max-w-3xl mx-auto mt-6 text-sm text-red-600 dark:text-red-400 flex justify-between">
+                <span
+                    className="cursor-pointer hover:underline"
+                    onClick={() => setDeleteAccountScreen(true)}
+                >
+                    Delete Account
+                </span>
+                <span
+                    className="cursor-pointer hover:underline"
+                    onClick={handleSignOut}
+                >
+                    Sign Out
+                </span>
             </div>
+
+            {/* Delete Modal */}
+            <Modal show={deleteAccountScreen} onClose={() => setDeleteAccountScreen(false)} popup size="md">
+                <Modal.Header />
+                <Modal.Body>
+                    <div className="flex flex-col items-center gap-4 text-center">
+                        <PiSealWarningFill className="text-red-600 w-12 h-12" />
+                        <p className="text-gray-800 dark:text-gray-100 font-medium">
+                            Are you sure you want to delete your account?
+                        </p>
+                        <div className="flex gap-4">
+                            <Button color="failure" onClick={handleDeleteUser}>
+                                Yes, I'm Sure
+                            </Button>
+                            <Button color="gray" onClick={() => setDeleteAccountScreen(false)}>
+                                Cancel
+                            </Button>
+                        </div>
+                    </div>
+                </Modal.Body>
+            </Modal>
         </div>
     );
-};
+}
 
 export default DashboardProfile;
