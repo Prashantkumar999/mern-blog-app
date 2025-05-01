@@ -1,6 +1,6 @@
 import { Button, Spinner } from 'flowbite-react';
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import CallToAction from '../components/CallToAction';
 import CommentSection from '../components/CommentSection';
 import PostCard from '../components/PostCard';
@@ -23,39 +23,32 @@ export default function PostPage() {
         setLoading(true);
         const res = await fetch(`/api/post/getposts?slug=${postSlug}`);
         const data = await res.json();
-        if (!res.ok) {
-          setError(true);
-          setLoading(false);
-          return;
-        }
-        if (res.ok) {
-          setPost(data.posts[0]);
-          setLoading(false);
-          setError(false);
-        }
+        if (!res.ok) throw new Error('Failed to fetch post');
+        setPost(data.posts[0]);
+        setError(false);
       } catch (error) {
+        console.error(error.message);
         setError(true);
+      } finally {
         setLoading(false);
       }
     };
     fetchPost();
   }, [postSlug]);
 
-  const fetchRecentPosts = async (startIndex) => {
+  const fetchRecentPosts = async (startIndex = 0) => {
     try {
       setRecentPostsLoading(true);
       const res = await fetch(`/api/post/getposts?startIndex=${startIndex}&limit=${POSTS_LIMIT}`);
       const data = await res.json();
       if (res.ok) {
         const newPosts = data.posts;
-        setRecentPosts((prevPosts) => [...prevPosts, ...newPosts]);
-        if (newPosts.length < POSTS_LIMIT) {
-          setShowMore(false); // Hide "Show More" button if fewer posts are fetched
-        }
+        setRecentPosts((prev) => [...prev, ...newPosts]);
+        if (newPosts.length < POSTS_LIMIT) setShowMore(false);
       }
-      setRecentPostsLoading(false);
     } catch (error) {
-      console.log(error.message);
+      console.error(error.message);
+    } finally {
       setRecentPostsLoading(false);
     }
   };
@@ -64,38 +57,47 @@ export default function PostPage() {
     fetchRecentPosts();
   }, []);
 
-  if (loading)
+  if (loading) {
     return (
-      <div className='flex justify-center items-center min-h-screen'>
-        <Spinner size='xl' />
+      <div className="flex justify-center items-center min-h-screen bg-gray-50">
+        <Spinner size="xl" />
       </div>
     );
+  }
 
   return (
-    <main className='p-3 flex flex-col max-w-6xl mx-auto min-h-screen'>
-      <div className='max-w-4xl mx-auto w-full'>
-      <HomePageHeroSec/>
-      </div>
-      <div className='flex flex-col justify-center items-center mb-5'>
-        <h1 className='text-3xl mt-5 font-semibold '>Recent Articles</h1>
-        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-5'>
-          {recentPosts &&
-            recentPosts.map((post) => <PostCard key={post._id} article={post} />)}
+    <main className="px-4 sm:px-6 md:px-10 max-w-7xl mx-auto flex flex-col gap-10 min-h-screen">
+      {/* Hero Section */}
+      <section className="max-w-4xl mx-auto w-full mt-4">
+        <HomePageHeroSec />
+      </section>
+
+      {/* Recent Articles */}
+      <section className="flex flex-col items-center">
+        <h2 className="text-3xl font-bold text-gray-800 mb-6">Recent Articles</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+          {recentPosts.map((post) => (
+            <PostCard key={post._id} article={post} />
+          ))}
         </div>
+
+        {/* Show More Button */}
         {showMore && !recentPostsLoading && (
           <Button
             onClick={() => fetchRecentPosts(recentPosts.length)}
-            className='mt-5'
+            className="mt-6"
           >
             Show More
           </Button>
         )}
+
+        {/* Spinner for loading more */}
         {recentPostsLoading && (
-          <div className='mt-5'>
-            <Spinner size='sm' />
+          <div className="mt-6">
+            <Spinner size="sm" />
           </div>
         )}
-      </div>
+      </section>
     </main>
   );
 }

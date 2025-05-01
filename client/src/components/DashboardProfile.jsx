@@ -252,8 +252,8 @@ const DashboardProfile = () => {
 
                 {/* Create Post (Admin only) */}
                 {currentUser.isAdmin && (
-                    <Link to="/create-post" className='mt-3'>
-                        <Button color="blue" className="w-full">
+                    <Link to="/create-post">
+                        <Button color="blue" className="w-full mt-2">
                             + Create Post
                         </Button>
                     </Link>

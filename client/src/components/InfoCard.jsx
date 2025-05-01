@@ -1,27 +1,27 @@
 import React from 'react';
 import { FaArrowUp } from "react-icons/fa";
 
-const InfoCard = ({ text, icon, total, lastMonth}) => {
+const InfoCard = ({ text, icon, total, lastMonth }) => {
     return (
-        <div className='border w-full py-4 flex flex-col justify-between'>
-            <div className='flex items-center gap-4 justify-between mx-4'>
+        <div className='w-full rounded-xl shadow-md bg-white dark:bg-gray-800 p-5 flex flex-col justify-between gap-4 transition-all'>
+            <div className='flex items-center justify-between'>
                 <div>
-                    <p className='font-semibold'>{text}</p>
-                    <p>{total}</p>
+                    <p className='text-gray-500 dark:text-gray-400 text-sm'>{text}</p>
+                    <h3 className='text-xl font-semibold text-gray-800 dark:text-white'>{total}</h3>
                 </div>
-                <div className='text-3xl bg-blue-600 p-2 rounded-full text-white'>
+                <div className='text-2xl bg-blue-600 p-3 rounded-full text-white'>
                     {icon}
                 </div>
             </div>
-            <div className='flex items-center gap-4 ml-4'>
-                <p className='flex items-center gap-1 text-green-400'>
-                    <FaArrowUp className='text-green-400 text-sm' />
+            <div className='flex items-center gap-2 text-sm text-gray-500 dark:text-gray-300'>
+                <span className='flex items-center text-green-500 font-medium'>
+                    <FaArrowUp className='text-xs mr-1' />
                     {lastMonth}
-                </p>
-                <p> Last Month</p>
+                </span>
+                <span>since last month</span>
             </div>
         </div>
     );
-}
+};
 
 export default InfoCard;
